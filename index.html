@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مليونير كرة القدم - من سيربح المليون</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#050a18">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خطوط جوجل وفونت أوسم -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Changa:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .font-changa { font-family: 'Changa', sans-serif; }
+        body {
+            background-color: #050a18;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        .stadium-bg {
+            background: radial-gradient(circle at 50% 15%, rgba(26, 68, 150, 0.45) 0%, rgba(5, 10, 24, 0.95) 75%),
+                        radial-gradient(circle at 10% 40%, rgba(0, 162, 255, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 40%, rgba(0, 162, 255, 0.15) 0%, transparent 40%);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(180deg, #fff7b2 0%, #ffd700 40%, #c88a10 70%, #7e5200 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-btn {
+            background: linear-gradient(180deg, #ffe066 0%, #f59e0b 50%, #b45309 100%);
+            box-shadow: 0 6px 0 #78350f, 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 25px rgba(245, 158, 11, 0.4);
+            transition: all 0.1s ease;
+        }
+        .gold-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #78350f, 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+        .card-blue {
+            background: linear-gradient(180deg, #102047 0%, #09132b 100%);
+            border: 1.5px solid #1e3a8a;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+        .card-blue:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+        .answer-btn {
+            background: linear-gradient(180deg, #13244e 0%, #0a132c 100%);
+            border: 1.5px solid #2563eb;
+            clip-path: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+            transition: all 0.2s;
+        }
+        .answer-btn.selected {
+            background: linear-gradient(180deg, #eab308 0%, #ca8a04 100%);
+            color: #000;
+            border-color: #fef08a;
+        }
+        .answer-btn.correct {
+            background: linear-gradient(180deg, #22c55e 0%, #15803d 100%) !important;
+            color: #fff !important;
+            border-color: #86efac !important;
+            animation: pulse-correct 0.6s infinite alternate;
+        }
+        .answer-btn.wrong {
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%) !important;
+            color: #fff !important;
+            border-color: #fca5a5 !important;
+        }
+        @keyframes pulse-correct {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
+        }
+    </style>
+</head>
+<body class="stadium-bg min-h-screen flex justify-center items-center p-0 m-0">
+
+    <div id="appContainer" class="w-full max-w-md h-screen max-h-[920px] flex flex-col justify-between relative overflow-hidden bg-transparent shadow-2xl">
+
+        <!-- 1. الشاشة الرئيسية -->
+        <div id="mainScreen" class="flex flex-col h-full justify-between pb-3 pt-2 px-4 overflow-y-auto">
+            
+            <!-- الهيدر العلوي -->
+            <div class="flex items-center justify-between z-10">
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleMenu()" class="w-9 h-9 rounded-full bg-slate-900/80 border border-slate-700 flex items-center justify-center text-amber-400 hover:border-amber-400">
+                        <i class="fa-solid fa-bars text-sm"></i>
+                    </button>
+                    <button onclick="openStatsModal()" class="w-9 h-9 rounded-full bg-slate-900/80 border border-slate-700 flex items-center justify-center text-amber-400 hover:border-amber-400">
+                        <i class="fa-solid fa-trophy text-sm"></i>
+                    </button>
+                    <button onclick="openSettingsModal()" class="w-9 h-9 rounded-full bg-slate-900/80 border border-slate-700 flex items-center justify-center text-amber-400 hover:border-amber-400">
+                        <i class="fa-solid fa-gear text-sm"></i>
+                    </button>
+                </div>
+
+                <div class="bg-slate-900/90 border border-cyan-500/50 rounded-full px-3 py-1 flex items-center gap-2 shadow-lg shadow-cyan-950/40">
+                    <button onclick="addGems(1000)" class="w-5 h-5 rounded-full bg-amber-500 text-black flex items-center justify-center text-xs font-bold hover:bg-amber-400">+</button>
+                    <span id="gemCount" class="font-changa font-bold text-sm tracking-wider text-cyan-300">200,000</span>
+                    <i class="fa-solid fa-gem text-cyan-400 text-sm"></i>
+                </div>
+
+                <div class="flex items-center gap-2 cursor-pointer" onclick="openAuthModal()">
+                    <div class="text-left">
+                        <div id="userDisplayName" class="text-xs font-black text-amber-300 tracking-wide">مليونير القدم</div>
+                        <div class="text-[10px] text-amber-500/80 flex items-center justify-end gap-1">
+                            <span>أسطورة اللعبة</span>
+                            <i class="fa-solid fa-crown text-[9px] text-amber-400"></i>
+                        </div>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-600 to-amber-300 p-0.5 shadow-md">
+                        <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center">
+                            <i class="fa-solid fa-user text-amber-300 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- مجسم الشعار المركزي وسلم المليون الجانبي -->
+            <div class="relative my-1 flex items-center justify-center">
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 bg-slate-950/70 border border-amber-500/30 rounded-lg p-1.5 text-[9px] font-changa flex flex-col gap-0.5 z-10 backdrop-blur-sm shadow-md">
+                    <div class="text-amber-400 font-bold border-b border-amber-500/30 pb-0.5 mb-0.5">15 • 1,000,000</div>
+                    <div class="text-amber-200/90">14 • 500 ألف</div>
+                    <div class="text-amber-200/90">13 • 250 ألف</div>
+                    <div class="text-amber-200/90">12 • 125 ألف</div>
+                    <div class="text-amber-200/90">11 • 64 ألف</div>
+                    <div class="text-cyan-400 font-bold border-b border-cyan-500/30 pb-0.5">10 • 32 ألف</div>
+                    <div class="text-slate-300">09 • 16 ألف</div>
+                    <div class="text-slate-300">08 • 8 آلاف</div>
+                    <div class="text-slate-300">07 • 4 آلاف</div>
+                    <div class="text-slate-300">06 • ألفين</div>
+                    <div class="text-cyan-400 font-bold border-b border-cyan-500/30 pb-0.5">05 • 1,000</div>
+                    <div class="text-slate-400">04 • 500</div>
+                    <div class="text-slate-400">03 • 300</div>
+                    <div class="text-slate-400">02 • 200</div>
+                    <div class="text-slate-400">01 • 100</div>
+                </div>
+
+                <div class="flex flex-col items-center text-center px-4">
+                    <div class="text-xs font-bold text-cyan-300 mb-1 drop-shadow">اختبر معرفتك.. وكن مليونيراً!</div>
+                    
+                    <div class="relative w-48 h-48 flex items-center justify-center">
+                        <div class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 via-amber-400 to-blue-500 opacity-20 blur-xl animate-pulse"></div>
+                        <div class="w-44 h-44 rounded-full border-4 border-amber-400/90 flex flex-col items-center justify-center p-2 relative shadow-[0_0_35px_rgba(245,158,11,0.45)] bg-slate-950">
+                            <i class="fa-solid fa-crown text-amber-400 text-2xl -mt-4 drop-shadow-[0_2px_8px_rgba(234,179,8,0.8)]"></i>
+                            <i class="fa-solid fa-futbol text-white/90 text-3xl my-1 drop-shadow"></i>
+                            <div class="text-xs font-bold tracking-widest text-blue-200">من سيربح</div>
+                            <div class="font-changa text-3xl font-black gold-gradient-text tracking-tight scale-110 -my-1 drop-shadow-md">مليون</div>
+                            <div class="text-[11px] font-bold text-amber-300 tracking-wide">في كرة القدم</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 border border-blue-500/40 rounded-full px-5 py-1 text-[11px] font-semibold text-slate-200 flex items-center gap-2 shadow-inner">
+                        <i class="fa-solid fa-futbol text-amber-400 text-xs"></i>
+                        <span>أسئلة كروية • تحدي المشجعين • هل أنت جاهز؟</span>
+                        <i class="fa-solid fa-futbol text-amber-400 text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- زر ابدأ اللعب -->
+            <div class="my-1 text-center px-2">
+                <button onclick="startMillionGame()" class="gold-btn w-full py-3.5 rounded-2xl flex items-center justify-center gap-3 text-slate-950 font-black text-2xl font-changa tracking-wide border-t border-amber-200">
+                    <i class="fa-solid fa-play text-xl"></i>
+                    <span>ابدأ اللعب</span>
+                </button>
+            </div>
+
+            <!-- بطاقات الأقسام الثلاثة -->
+            <div class="grid grid-cols-3 gap-2.5 my-1">
+                <div onclick="openStatsModal()" class="card-blue rounded-xl p-2.5 text-center cursor-pointer transition flex flex-col items-center justify-between">
+                    <div class="w-10 h-10 rounded-full bg-blue-900/50 flex items-center justify-center text-amber-400 mb-1 border border-blue-700/50">
+                        <i class="fa-solid fa-chart-column text-lg"></i>
+                    </div>
+                    <div class="font-bold text-xs text-white">إحصائياتي</div>
+                    <div class="text-[10px] text-slate-400">شوف مستواك</div>
+                </div>
+
+                <div onclick="openRewardsModal()" class="card-blue rounded-xl p-2.5 text-center cursor-pointer transition flex flex-col items-center justify-between">
+                    <div class="w-10 h-10 rounded-full bg-blue-900/50 flex items-center justify-center text-amber-400 mb-1 border border-blue-700/50">
+                        <i class="fa-solid fa-gift text-lg"></i>
+                    </div>
+                    <div class="font-bold text-xs text-white">المكافآت</div>
+                    <div class="text-[10px] text-slate-400">جوائز وهدايا</div>
+                </div>
+
+                <div onclick="openHelpModal()" class="card-blue rounded-xl p-2.5 text-center cursor-pointer transition flex flex-col items-center justify-between">
+                    <div class="w-10 h-10 rounded-full bg-blue-900/50 flex items-center justify-center text-amber-400 mb-1 border border-blue-700/50">
+                        <i class="fa-solid fa-lightbulb text-lg"></i>
+                    </div>
+                    <div class="font-bold text-xs text-white">المساعدات</div>
+                    <div class="text-[10px] text-slate-400">استخدمها بحكمة</div>
+                </div>
+            </div>
+
+            <!-- البانر التحفيزي -->
+            <div class="relative bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border border-amber-500/40 rounded-xl p-3 flex items-center justify-between overflow-hidden shadow-lg">
+                <div class="text-right z-10 max-w-[70%]">
+                    <p class="text-xs font-bold text-amber-300">ليس فقط عن كرة القدم ..</p>
+                    <p class="text-xs font-extrabold text-white">بل عن ذكائك وشغفك بها!</p>
+                </div>
+                <div class="w-12 h-12 rounded-full border-2 border-amber-400 flex items-center justify-center bg-blue-950 relative shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                    <i class="fa-solid fa-crown text-amber-400 text-xs absolute -top-2"></i>
+                    <i class="fa-solid fa-futbol text-white text-xl"></i>
+                </div>
+            </div>
+
+            <!-- الشريط السفلي -->
+            <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-800 text-center text-slate-400 text-[10px]">
+                <button onclick="showDailyFact()" class="flex flex-col items-center hover:text-amber-400">
+                    <i class="fa-solid fa-star text-amber-400 text-sm mb-0.5"></i>
+                    <span class="font-bold text-slate-200">معلومة اليوم</span>
+                    <span>هل تعلم؟</span>
+                </button>
+                <button onclick="showBestPlayers()" class="flex flex-col items-center hover:text-amber-400">
+                    <i class="fa-solid fa-futbol text-amber-400 text-sm mb-0.5"></i>
+                    <span class="font-bold text-slate-200">أفضل اللاعبين</span>
+                    <span>اكتشف الأبطال</span>
+                </button>
+                <button onclick="showLatestChallenges()" class="flex flex-col items-center hover:text-amber-400">
+                    <i class="fa-solid fa-trophy text-amber-400 text-sm mb-0.5"></i>
+                    <span class="font-bold text-slate-200">أحدث التحديات</span>
+                    <span>ماذا الجديد؟</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. مسرح الأسئلة واللعب -->
+        <div id="gamePlayScreen" class="hidden flex flex-col h-full justify-between p-4 bg-slate-950/95 z-20">
+            <div class="flex items-center justify-between border-b border-blue-900 pb-2">
+                <button onclick="confirmExitGame()" class="text-xs bg-red-950/80 text-red-300 border border-red-700/50 px-3 py-1.5 rounded-lg flex items-center gap-1">
+                    <i class="fa-solid fa-person-walking-arrow-right"></i>
+                    <span>انسحاب</span>
+                </button>
+                
+                <div class="flex items-center gap-2">
+                    <div id="timerCircle" class="w-10 h-10 rounded-full border-2 border-amber-400 flex items-center justify-center font-changa font-bold text-base text-amber-300 bg-blue-950">
+                        30
+                    </div>
+                </div>
+
+                <div class="text-left font-changa">
+                    <div class="text-[10px] text-slate-400">سؤال رقم <span id="currentQuestionNum">1</span>/15</div>
+                    <div id="currentPrizeText" class="text-sm font-bold text-amber-400">100 نقطة</div>
+                </div>
+            </div>
+
+            <!-- وسائل المساعدة -->
+            <div class="flex items-center justify-center gap-4 my-2">
+                <button id="btnHelp5050" onclick="useHelp5050()" class="w-12 h-10 rounded-lg bg-blue-900/80 border border-blue-600 flex flex-col items-center justify-center hover:border-amber-400 active:scale-95 transition">
+                    <span class="text-xs font-black text-amber-300">50:50</span>
+                    <span class="text-[8px] text-slate-300">حذف إجابتين</span>
+                </button>
+                <button id="btnHelpAudience" onclick="useHelpAudience()" class="w-12 h-10 rounded-lg bg-blue-900/80 border border-blue-600 flex flex-col items-center justify-center hover:border-amber-400 active:scale-95 transition">
+                    <i class="fa-solid fa-users text-amber-300 text-xs"></i>
+                    <span class="text-[8px] text-slate-300">الجمهور</span>
+                </button>
+                <button id="btnHelpPhone" onclick="useHelpPhone()" class="w-12 h-10 rounded-lg bg-blue-900/80 border border-blue-600 flex flex-col items-center justify-center hover:border-amber-400 active:scale-95 transition">
+                    <i class="fa-solid fa-phone text-amber-300 text-xs"></i>
+                    <span class="text-[8px] text-slate-300">اتصال بمحلل</span>
+                </button>
+            </div>
+
+            <!-- نص السؤال -->
+            <div class="my-auto py-4 px-3 bg-gradient-to-b from-blue-950 to-slate-900 border-2 border-blue-500/70 rounded-2xl shadow-[0_0_20px_rgba(37,99,235,0.3)] text-center">
+                <span class="text-[11px] font-bold text-amber-400 tracking-wider block mb-1">كرة القدم الرجالية العالمية والمحلية</span>
+                <p id="questionText" class="text-base sm:text-lg font-extrabold text-white leading-relaxed">
+                    جاري تحميل السؤال...
+                </p>
+            </div>
+
+            <!-- خيارات الإجابة -->
+            <div class="flex flex-col gap-2.5 my-2">
+                <button onclick="selectAnswer(0)" id="opt0" class="answer-btn py-3 px-6 text-sm font-bold text-right flex items-center justify-between text-slate-100">
+                    <span class="text-amber-400 font-changa text-base ml-2">أ:</span>
+                    <span id="optText0" class="flex-1 text-right">--</span>
+                </button>
+                <button onclick="selectAnswer(1)" id="opt1" class="answer-btn py-3 px-6 text-sm font-bold text-right flex items-center justify-between text-slate-100">
+                    <span class="text-amber-400 font-changa text-base ml-2">ب:</span>
+                    <span id="optText1" class="flex-1 text-right">--</span>
+                </button>
+                <button onclick="selectAnswer(2)" id="opt2" class="answer-btn py-3 px-6 text-sm font-bold text-right flex items-center justify-between text-slate-100">
+                    <span class="text-amber-400 font-changa text-base ml-2">ج:</span>
+                    <span id="optText2" class="flex-1 text-right">--</span>
+                </button>
+                <button onclick="selectAnswer(3)" id="opt3" class="answer-btn py-3 px-6 text-sm font-bold text-right flex items-center justify-between text-slate-100">
+                    <span class="text-amber-400 font-changa text-base ml-2">د:</span>
+                    <span id="optText3" class="flex-1 text-right">--</span>
+                </button>
+            </div>
+
+            <div class="text-center text-[10px] text-slate-400 border-t border-slate-900 pt-2 flex justify-around">
+                <span>محطة الأمان الأولى: <strong class="text-cyan-400">1,000</strong></span>
+                <span>محطة الأمان الثانية: <strong class="text-cyan-400">32,000</strong></span>
+                <span>القمة: <strong class="text-amber-400 font-bold">1,000,000</strong></span>
+            </div>
+        </div>
+
+        <!-- 3. نافذة تسجيل الدخول -->
+        <div id="authModal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="w-full bg-slate-900 border-2 border-amber-500 rounded-2xl p-5 shadow-2xl relative">
+                <button onclick="closeAuthModal()" class="absolute top-3 left-3 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <div class="text-center mb-4">
+                    <i class="fa-solid fa-id-card text-3xl text-amber-400 mb-1"></i>
+                    <h3 class="font-changa font-bold text-lg text-white">تسجيل الدخول للاعب</h3>
+                    <p class="text-xs text-slate-400">احفظ أرقامك القياسية وكم مرة وصلت للمليون</p>
+                </div>
+
+                <div class="flex border-b border-slate-800 mb-4 text-xs">
+                    <button id="tabPhoneBtn" onclick="switchAuthTab('phone')" class="flex-1 py-2 text-center font-bold border-b-2 border-amber-400 text-amber-300">برقم الهاتف</button>
+                    <button id="tabEmailBtn" onclick="switchAuthTab('email')" class="flex-1 py-2 text-center text-slate-400">بالبريد الإلكتروني</button>
+                </div>
+
+                <div id="phoneForm" class="space-y-3">
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">اسم اللاعب / اللقب:</label>
+                        <input id="playerNameInput" type="text" placeholder="مثال: أسطورة التكتيك" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">رقم الهاتف:</label>
+                        <input id="playerPhoneInput" type="tel" placeholder="01xxxxxxxxx" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400 text-left" dir="ltr">
+                    </div>
+                </div>
+
+                <div id="emailForm" class="hidden space-y-3">
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">البريد الإلكتروني:</label>
+                        <input id="playerEmailInput" type="email" placeholder="player@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400 text-left" dir="ltr">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-300 block mb-1">كلمة المرور:</label>
+                        <input id="playerPassInput" type="password" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400 text-left" dir="ltr">
+                    </div>
+                </div>
+
+                <div class="mt-4 flex flex-col gap-2">
+                    <button onclick="saveUserLogin()" class="gold-btn py-2.5 rounded-xl font-bold text-slate-950 text-sm">حفظ ومتابعة</button>
+                    <button onclick="guestLogin()" class="bg-slate-800 text-slate-300 py-2 rounded-xl text-xs hover:bg-slate-700">دخول سريع كضيف</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. نافذة الإحصائيات (كم مرة حققت المليون) -->
+        <div id="statsModal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="w-full bg-slate-900 border-2 border-amber-500 rounded-2xl p-5 shadow-2xl relative text-center">
+                <button onclick="closeStatsModal()" class="absolute top-3 left-3 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                
+                <i class="fa-solid fa-trophy text-4xl text-amber-400 mb-2 drop-shadow"></i>
+                <h3 class="font-changa font-bold text-lg text-white">إحصائيات المليونير الكروي</h3>
+                <p class="text-xs text-slate-400 mb-4">سجل إنجازاتك في التحديات الكروية</p>
+
+                <div class="bg-gradient-to-r from-amber-950/60 via-amber-900/40 to-amber-950/60 border-2 border-amber-400/80 rounded-xl p-3 mb-3">
+                    <div class="text-xs font-bold text-amber-200">كم مرة ربحت المليون؟</div>
+                    <div id="statMillionCount" class="font-changa text-3xl font-black text-amber-300 my-1">0</div>
+                    <div class="text-[10px] text-amber-400/80">لقب المليونير الحقيقي في كرة القدم</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-400 block">إجمالي المباريات:</span>
+                        <strong id="statTotalGames" class="text-white text-base font-changa">0</strong>
+                    </div>
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-400 block">إجابات صحيحة:</span>
+                        <strong id="statCorrectAnswers" class="text-green-400 text-base font-changa">0</strong>
+                    </div>
+                </div>
+
+                <button onclick="closeStatsModal()" class="mt-4 w-full bg-blue-900 text-white py-2 rounded-xl font-bold text-xs hover:bg-blue-800">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. نافذة التنبيهات -->
+        <div id="alertModal" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="w-full bg-slate-900 border border-blue-500 rounded-2xl p-5 text-center shadow-2xl">
+                <div id="alertIcon" class="text-4xl mb-2">🎉</div>
+                <h3 id="alertTitle" class="text-lg font-changa font-bold text-white mb-1">تهانينا!</h3>
+                <p id="alertMsg" class="text-xs text-slate-300 mb-4 leading-relaxed">رسالة التنبيه</p>
+                <button onclick="closeAlertModal()" class="gold-btn py-2 px-6 rounded-xl text-slate-950 font-bold text-xs">
+                    حسناً
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTone(freq, type = 'sine', duration = 0.2, gainVal = 0.1) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function playCorrectSound() {
+            playTone(523.25, 'triangle', 0.15, 0.2);
+            setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.2), 150);
+            setTimeout(() => playTone(783.99, 'triangle', 0.3, 0.25), 300);
+            setTimeout(() => playTone(1046.50, 'triangle', 0.4, 0.3), 450);
+        }
+
+        function playWrongSound() {
+            playTone(220, 'sawtooth', 0.2, 0.25);
+            setTimeout(() => playTone(164.81, 'sawtooth', 0.4, 0.3), 180);
+        }
+
+        function playWinMillionSound() {
+            const notes = [440, 554, 659, 880, 740, 880, 1108];
+            notes.forEach((freq, idx) => {
+                setTimeout(() => playTone(freq, 'triangle', 0.3, 0.25), idx * 180);
+            });
+        }
+
+        const ladderPrizes = [
+            "100", "200", "300", "500", "1,000",
+            "2,000", "4,000", "8,000", "16,000", "32,000",
+            "64,000", "125,000", "250,000", "500,000", "1,000,000"
+        ];
+
+        const footballQuestionBank = [
+            { level: 1, q: "كم عدد لاعبي الفريق الواحد داخل أرض الملعب في مباريات كرة القدم الرسمية؟", opts: ["9 لاعبين", "11 لاعباً", "10 لاعبين", "12 لاعباً"], answer: 1 },
+            { level: 2, q: "ما هي الدولة الأكثر تتويجاً ببطولة كأس العالم للرجال تاريخياً بـ 5 ألقاب؟", opts: ["ألمانيا", "إيطاليا", "البرازيل", "الأرجنتين"], answer: 2 },
+            { level: 3, q: "أي نادٍ إسباني اشتهر بلقب (الميرنجي) ويحمل الرقم القياسي في دوري أبطال أوروبا؟", opts: ["برشلونة", "أتلتيكو مدريد", "ريال مدريد", "فالنسيا"], answer: 2 },
+            { level: 4, q: "اللاعب الأرجنتيني الأسطوري ليونيل ميسي ارتدى قميص أي نادٍ فرنسي بعد رحيله عن برشلونة؟", opts: ["مارسيليا", "باريس سان جيرمان", "موناكو", "ليون"], answer: 1 },
+            { level: 5, q: "كم سنة تفصل بين كل نسخة من بطولات كأس العالم لكرة القدم للرجال؟", opts: ["سنتان", "3 سنوات", "4 سنوات", "5 سنوات"], answer: 2 },
+            { level: 6, q: "من هو المدرب الفرنسي الذي قاد ريال مدريد للتتويج بثلاثية متتالية في دوري أبطال أوروبا؟", opts: ["ديدييه ديشامب", "زين الدين زيدان", "أرسين فينجر", "لوران بلان"], answer: 1 },
+            { level: 7, q: "من هو الهداف التاريخي لبطولات كأس العالم برصيد 16 هدفاً؟", opts: ["رونالدو البرازيلي", "ميروسلاف كلوزه", "بيليه", "كيليان مبابي"], answer: 1 },
+            { level: 8, q: "أي منتخب إفريقي حقق المركز الرابع التاريخي في كأس العالم قطر 2022؟", opts: ["السنغال", "غانا", "المغرب", "مصر"], answer: 2 },
+            { level: 9, q: "الأسطورة دييغو مارادونا قاد أي نادٍ إيطالي للفوز بلقب الدوري التاريخي في الثمانينيات؟", opts: ["ميلان", "يوفنتوس", "نابولي", "إنتر ميلان"], answer: 2 },
+            { level: 10, q: "من هو اللاعب الذي توج بجائزة الكرة الذهبية (Ballon d'Or) لعام 2004 وكان يقود هجوم ميلان؟", opts: ["أندريه شيفتشينكو", "تيري هنري", "رونالدينيو", "رونالدو الظاهرة"], answer: 0 },
+            { level: 11, q: "أي منتخب رجالي حقق أول لقب في تاريخ كأس العالم عام 1930 بعد فوزه في النهائي على الأرجنتين؟", opts: ["البرازيل", "أوروغواي", "إيطاليا", "إنجلترا"], answer: 1 },
+            { level: 12, q: "من هو المدافع الألماني الأسطوري الملقب بـ (القيصر) وتوج بكأس العالم كلاعب وكمدرب؟", opts: ["لوتار ماتيوس", "فرانز بيكنباور", "يورغن كلينسمان", "أوليفر كان"], answer: 1 },
+            { level: 13, q: "كم هدفاً سجل الأسطورة رونالدو نازاريو (الظاهرة) في بطولة كأس العالم 2002 ليتوج هدافاً للبطولة؟", opts: ["6 أهداف", "7 أهداف", "8 أهداف", "9 أهداف"], answer: 2 },
+            { level: 14, q: "من سجل الهدف الصاروخي الشهير في نهائي دوري أبطال أوروبا 2002 ضد باير ليفركوزن؟", opts: ["راؤول غونزاليس", "زين الدين زيدان", "روبرتو كارلوس", "لويس فيغو"], answer: 1 },
+            { level: 15, q: "سؤال المليون: من هو صاحب أسرع هدف في تاريخ نهائيات كأس العالم لكرة القدم بعد مرور 11 ثانية فقط؟", opts: ["برايان روبسون", "هاكان شوكور", "كلينت ديمبسي", "إرنست ليكاناتي"], answer: 1 }
+        ];
+
+        let gameState = {
+            currentLevel: 1,
+            timer: 30,
+            timerInterval: null,
+            help50Used: false,
+            helpAudienceUsed: false,
+            helpPhoneUsed: false,
+            selectedOption: null,
+            canAnswer: true
+        };
+
+        let userProfile = {
+            name: "مليونير القدم",
+            phone: "",
+            email: "",
+            gems: 200000,
+            totalGames: 0,
+            correctAnswers: 0,
+            millionWins: 0
+        };
+
+        function loadSavedData() {
+            const saved = localStorage.getItem('footballMillionaireUser');
+            if (saved) {
+                userProfile = Object.assign(userProfile, JSON.parse(saved));
+            }
+            updateUIProfile();
+        }
+
+        function saveUserData() {
+            localStorage.setItem('footballMillionaireUser', JSON.stringify(userProfile));
+            updateUIProfile();
+        }
+
+        function updateUIProfile() {
+            document.getElementById('userDisplayName').innerText = userProfile.name || "مليونير القدم";
+            document.getElementById('gemCount').innerText = Number(userProfile.gems).toLocaleString();
+            document.getElementById('statMillionCount').innerText = userProfile.millionWins;
+            document.getElementById('statTotalGames').innerText = userProfile.totalGames;
+            document.getElementById('statCorrectAnswers').innerText = userProfile.correctAnswers;
+        }
+
+        function startMillionGame() {
+            gameState.currentLevel = 1;
+            gameState.help50Used = false;
+            gameState.helpAudienceUsed = false;
+            gameState.helpPhoneUsed = false;
+            
+            resetHelpButtonsUI();
+
+            document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('gamePlayScreen').classList.remove('hidden');
+
+            userProfile.totalGames++;
+            saveUserData();
+
+            loadQuestion(gameState.currentLevel);
+        }
+
+        function resetHelpButtonsUI() {
+            ['btnHelp5050', 'btnHelpAudience', 'btnHelpPhone'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('opacity-30', 'cursor-not-allowed');
+                el.removeAttribute('disabled');
+            });
+        }
+
+        function loadQuestion(lvl) {
+            gameState.canAnswer = true;
+            gameState.selectedOption = null;
+            clearInterval(gameState.timerInterval);
+            gameState.timer = 30;
+
+            const qData = footballQuestionBank.find(item => item.level === lvl);
+            if (!qData) {
+                winTheMillion();
+                return;
+            }
+
+            document.getElementById('currentQuestionNum').innerText = lvl;
+            document.getElementById('currentPrizeText').innerText = ladderPrizes[lvl - 1] + " نقطة ذهبية";
+            document.getElementById('questionText').innerText = qData.q;
+
+            for (let i = 0; i < 4; i++) {
+                const btn = document.getElementById('opt' + i);
+                const txt = document.getElementById('optText' + i);
+                btn.className = "answer-btn py-3 px-6 text-sm font-bold text-right flex items-center justify-between text-slate-100";
+                btn.style.visibility = 'visible';
+                txt.innerText = qData.opts[i];
+            }
+
+            const timerEl = document.getElementById('timerCircle');
+            timerEl.innerText = gameState.timer;
+            timerEl.classList.remove('border-red-500', 'text-red-400');
+            timerEl.classList.add('border-amber-400', 'text-amber-300');
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer--;
+                timerEl.innerText = gameState.timer;
+                if (gameState.timer <= 10) {
+                    timerEl.classList.remove('border-amber-400', 'text-amber-300');
+                    timerEl.classList.add('border-red-500', 'text-red-400');
+                    playTone(800, 'sine', 0.05, 0.05);
+                }
+                if (gameState.timer <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(index) {
+            if (!gameState.canAnswer) return;
+            gameState.canAnswer = false;
+            clearInterval(gameState.timerInterval);
+
+            playTone(400, 'square', 0.1, 0.1);
+            const btn = document.getElementById('opt' + index);
+            btn.classList.add('selected');
+
+            const currentQ = footballQuestionBank.find(item => item.level === gameState.currentLevel);
+
+            setTimeout(() => {
+                if (index === currentQ.answer) {
+                    btn.classList.remove('selected');
+                    btn.classList.add('correct');
+                    playCorrectSound();
+                    userProfile.correctAnswers++;
+                    saveUserData();
+
+                    setTimeout(() => {
+                        if (gameState.currentLevel === 15) {
+                            winTheMillion();
+                        } else {
+                            gameState.currentLevel++;
+                            loadQuestion(gameState.currentLevel);
+                        }
+                    }, 1200);
+
+                } else {
+                    btn.classList.remove('selected');
+                    btn.classList.add('wrong');
+                    document.getElementById('opt' + currentQ.answer).classList.add('correct');
+                    playWrongSound();
+
+                    setTimeout(() => {
+                        gameOver(false);
+                    }, 1500);
+                }
+            }, 1500);
+        }
+
+        function handleTimeOut() {
+            gameState.canAnswer = false;
+            playWrongSound();
+            showAlertModal('انتهى الوقت!', 'للأسف انتهت الـ 30 ثانية المخصصة للتفكير في هذا السؤال.', () => {
+                gameOver(false);
+            });
+        }
+
+        function winTheMillion() {
+            userProfile.millionWins++;
+            userProfile.gems += 50000;
+            saveUserData();
+            playWinMillionSound();
+
+            showAlertModal('🏆 مبرووووك! لقد ربحت المليون!', 
+                'أنت الآن أسطورة المليونير الكروي الحقيقي! أجبت على جميع الأسئلة الـ 15 بنجاح ونلت اللقب والمليون نقطة.', 
+                () => { exitToMainMenu(); }
+            );
+        }
+
+        function gameOver(isWithdrawal) {
+            let securedPrize = "0";
+            if (isWithdrawal) {
+                securedPrize = gameState.currentLevel > 1 ? ladderPrizes[gameState.currentLevel - 2] : "0";
+            } else {
+                if (gameState.currentLevel > 10) securedPrize = "32,000";
+                else if (gameState.currentLevel > 5) securedPrize = "1,000";
+                else securedPrize = "0";
+            }
+
+            showAlertModal(
+                isWithdrawal ? 'قرار حكيم بالانسحاب' : 'إجابة خاطئة - حظ أوفر!',
+                `لقد خرجت من هذه المواجهة بجائزة قدرها: ${securedPrize} نقطة. واصل التحدي لتصل إلى المليون!`,
+                () => { exitToMainMenu(); }
+            );
+        }
+
+        function confirmExitGame() {
+            if (confirm('هل ترغب بالانسحاب والاحتفاظ برصيدك الحالي قبل الإجابة؟')) {
+                clearInterval(gameState.timerInterval);
+                gameOver(true);
+            }
+        }
+
+        function exitToMainMenu() {
+            clearInterval(gameState.timerInterval);
+            document.getElementById('gamePlayScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            updateUIProfile();
+        }
+
+        function useHelp5050() {
+            if (gameState.help50Used || !gameState.canAnswer) return;
+            gameState.help50Used = true;
+            document.getElementById('btnHelp5050').classList.add('opacity-30', 'cursor-not-allowed');
+
+            const currentQ = footballQuestionBank.find(item => item.level === gameState.currentLevel);
+            let wrongIndices = [0, 1, 2, 3].filter(idx => idx !== currentQ.answer);
+            wrongIndices.sort(() => Math.random() - 0.5);
+            document.getElementById('opt' + wrongIndices[0]).style.visibility = 'hidden';
+            document.getElementById('opt' + wrongIndices[1]).style.visibility = 'hidden';
+            playTone(600, 'sine', 0.15, 0.1);
+        }
+
+        function useHelpAudience() {
+            if (gameState.helpAudienceUsed || !gameState.canAnswer) return;
+            gameState.helpAudienceUsed = true;
+            document.getElementById('btnHelpAudience').classList.add('opacity-30', 'cursor-not-allowed');
+
+            const currentQ = footballQuestionBank.find(item => item.level === gameState.currentLevel);
+            const chars = ['أ', 'ب', 'ج', 'د'];
+            showAlertModal('تصويت جمهور الاستاد 📊', 
+                `أغلبية الجمهور في المدرجات صوتت لصالح الخيار (${chars[currentQ.answer]}) بنسبة 74% كإجابة صحيحة.`
+            );
+        }
+
+        function useHelpPhone() {
+            if (gameState.helpPhoneUsed || !gameState.canAnswer) return;
+            gameState.helpPhoneUsed = true;
+            document.getElementById('btnHelpPhone').classList.add('opacity-30', 'cursor-not-allowed');
+
+            const currentQ = footballQuestionBank.find(item => item.level === gameState.currentLevel);
+            const chars = ['أ', 'ب', 'ج', 'د'];
+            showAlertModal('اتصال بمحلل كروي 📞', 
+                `المحلل الكروي: "أهلاً بك! بحسب السجلات والإحصائيات الكروية أنا متأكد بنسبة 90% أن الإجابة الصحيحة هي (${chars[currentQ.answer]}). بالتوفيق!"`
+            );
+        }
+
+        function openAuthModal() {
+            document.getElementById('playerNameInput').value = userProfile.name || "";
+            document.getElementById('playerPhoneInput').value = userProfile.phone || "";
+            document.getElementById('playerEmailInput').value = userProfile.email || "";
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+        function switchAuthTab(type) {
+            const pForm = document.getElementById('phoneForm');
+            const eForm = document.getElementById('emailForm');
+            const pBtn = document.getElementById('tabPhoneBtn');
+            const eBtn = document.getElementById('tabEmailBtn');
+
+            if (type === 'phone') {
+                pForm.classList.remove('hidden');
+                eForm.classList.add('hidden');
+                pBtn.className = "flex-1 py-2 text-center font-bold border-b-2 border-amber-400 text-amber-300";
+                eBtn.className = "flex-1 py-2 text-center text-slate-400";
+            } else {
+                pForm.classList.add('hidden');
+                eForm.classList.remove('hidden');
+                eBtn.className = "flex-1 py-2 text-center font-bold border-b-2 border-amber-400 text-amber-300";
+                pBtn.className = "flex-1 py-2 text-center text-slate-400";
+            }
+        }
+
+        function saveUserLogin() {
+            const name = document.getElementById('playerNameInput').value.trim();
+            const phone = document.getElementById('playerPhoneInput').value.trim();
+            const email = document.getElementById('playerEmailInput').value.trim();
+
+            if (name) userProfile.name = name;
+            if (phone) userProfile.phone = phone;
+            if (email) userProfile.email = email;
+
+            saveUserData();
+            closeAuthModal();
+            showAlertModal('تم تسجيل الدخول بنجاح', `أهلاً بك يا ${userProfile.name}، بياناتك ونقاطك محفوظة.`);
+        }
+
+        function guestLogin() {
+            userProfile.name = "ضيف كروي " + Math.floor(Math.random() * 900 + 100);
+            saveUserData();
+            closeAuthModal();
+        }
+
+        function openStatsModal() {
+            updateUIProfile();
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+        function closeStatsModal() { document.getElementById('statsModal').classList.add('hidden'); }
+
+        function openRewardsModal() {
+            showAlertModal('صندوق المكافآت الكروية 🎁', 'سجل دخول يومياً لتكسب 5,000 جوهرة مجانية تساعدك على تجديد وسائل المساعدة داخل التحديات!');
+        }
+
+        function openHelpModal() {
+            showAlertModal('دليل المساعدات 💡', '1. 50:50 لحذف إجابتين غير صحيحتين.\n2. رأي الجمهور لاستطلاع آراء المدرجات.\n3. اتصال بمحلل رياضي خبير.');
+        }
+
+        function openSettingsModal() {
+            showAlertModal('إعدادات اللعبة ⚙️', 'الصوت: مفعّل 🔊\nاللغة: العربية 🇪🇬\nالإصدار: 1.0.0 (مليونير كرة القدم)');
+        }
+
+        function toggleMenu() { openStatsModal(); }
+
+        function addGems(amt) {
+            userProfile.gems += amt;
+            saveUserData();
+            playTone(800, 'triangle', 0.1, 0.1);
+        }
+
+        function showDailyFact() {
+            const facts = [
+                "هل تعلم أن أول بطولة كأس عالم أقيمت في الأوروغواي عام 1930 وفازت بها الدولة المضيفة؟",
+                "هل تعلم أن كريستيانو رونالدو وليونيل ميسي هما أكثر من سجلا أهدافاً في تاريخ دوري أبطال أوروبا؟",
+                "هل تعلم أن منتخب مصر يحمل الرقم القياسي التاريخي بـ 7 ألقاب في كأس الأمم الأفريقية؟"
+            ];
+            const randomFact = facts[Math.floor(Math.random() * facts.length)];
+            showAlertModal('معلومة اليوم الكروية ⚽', randomFact);
+        }
+
+        function showBestPlayers() {
+            showAlertModal('أساطير كرة القدم 🌟', 'بيليه، مارادونا، زيدان، رونالدو الظاهرة، ميسي، وكريستيانو.. بصمات خالدة في تاريخ الساحرة المستديرة.');
+        }
+
+        function showLatestChallenges() {
+            showAlertModal('أحدث التحديات 🏆', 'تحدي كأس العالم وتحدي دوري أبطال أوروبا متاحان الآن داخل اللعبة لتصل إلى لقب المليونير!');
+        }
+
+        let alertCallback = null;
+        function showAlertModal(title, msg, callback = null) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = msg;
+            alertCallback = callback;
+            document.getElementById('alertModal').classList.remove('hidden');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.add('hidden');
+            if (alertCallback) {
+                const cb = alertCallback;
+                alertCallback = null;
+                cb();
+            }
+        }
+
+        window.onload = function() {
+            loadSavedData();
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            }
+        };
+    </script>
+</body>
+</html>
